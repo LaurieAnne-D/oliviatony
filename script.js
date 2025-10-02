@@ -1,3 +1,94 @@
+document.body.classList.add('js');
+
+const reduceMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+const heroElements = Array.from(document.querySelectorAll('.hero .animate-on-load'));
+const revealElements = Array.from(document.querySelectorAll('.reveal-on-scroll'));
+
+const applyHeroStagger = () => {
+  heroElements.forEach((element, index) => {
+    element.style.setProperty('--stagger', `${index * 140}ms`);
+  });
+};
+
+const clearHeroStagger = () => {
+  heroElements.forEach((element) => {
+    element.style.removeProperty('--stagger');
+  });
+};
+
+const applyRevealDelays = () => {
+  revealElements.forEach((element, index) => {
+    const clampedIndex = Math.min(index, 4);
+    element.style.setProperty('--reveal-delay', `${clampedIndex * 90}ms`);
+  });
+};
+
+const showAllRevealElements = () => {
+  revealElements.forEach((element) => {
+    element.classList.add('is-visible');
+    element.style.removeProperty('--reveal-delay');
+  });
+};
+
+let revealObserver = null;
+
+const activateRevealObserver = () => {
+  if (revealObserver || !revealElements.length) {
+    return;
+  }
+
+  revealObserver = new IntersectionObserver(
+    (entries, observer) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    },
+    {
+      threshold: 0.18,
+      rootMargin: '0px 0px -10% 0px',
+    }
+  );
+
+  revealElements.forEach((element) => {
+    if (!element.classList.contains('is-visible')) {
+      revealObserver.observe(element);
+    }
+  });
+};
+
+const handleMotionPreferenceChange = (event) => {
+  if (event.matches) {
+    clearHeroStagger();
+    if (revealObserver) {
+      revealObserver.disconnect();
+      revealObserver = null;
+    }
+    showAllRevealElements();
+  } else {
+    applyHeroStagger();
+    applyRevealDelays();
+    activateRevealObserver();
+  }
+};
+
+if (reduceMotionQuery.matches) {
+  clearHeroStagger();
+  showAllRevealElements();
+} else {
+  applyHeroStagger();
+  applyRevealDelays();
+  activateRevealObserver();
+}
+
+if (typeof reduceMotionQuery.addEventListener === 'function') {
+  reduceMotionQuery.addEventListener('change', handleMotionPreferenceChange);
+} else if (typeof reduceMotionQuery.addListener === 'function') {
+  reduceMotionQuery.addListener(handleMotionPreferenceChange);
+}
+
 const faqButtons = document.querySelectorAll('.faq__question');
 
 faqButtons.forEach((button) => {

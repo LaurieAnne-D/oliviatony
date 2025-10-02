@@ -17,6 +17,32 @@ body {
   justify-content: center;
 }
 
+.animate-on-load,
+.reveal-on-scroll {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+body.js .animate-on-load {
+  opacity: 0;
+  transform: translateY(18px);
+  animation: fade-up 0.9s ease forwards;
+  animation-delay: var(--stagger, 0s);
+}
+
+body.js .reveal-on-scroll {
+  opacity: 0;
+  transform: translateY(36px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+  transition-delay: var(--reveal-delay, 0s);
+}
+
+body.js .reveal-on-scroll.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: 0s;
+}
+
 img {
   max-width: 100%;
   display: block;
@@ -88,6 +114,7 @@ section {
   height: 32px;
   background: var(--rule);
   position: relative;
+  animation: scroll-indicator 1.6s ease-in-out infinite;
 }
 
 .scroll-hint span::after {
@@ -149,9 +176,10 @@ section {
   background-color: var(--rule);
 }
 
-.story{
-display: flex;
-flex-direction:column ;
+.story {
+  display: flex;
+  flex-direction: column;
+  position: relative;
 }
 
 .bloc {
@@ -159,28 +187,28 @@ flex-direction:column ;
   position: absolute;
   height: 80px;
   width: 60%;
-    background-color: var(--accent);
+  background-color: var(--accent);
 }
 
 .story-ctn {
   position: relative;
   z-index: 1001;
   text-align: start;
+}
 
-  h2 {
-    text-transform: uppercase;
-    align-self: center;
-    font-weight: 600;
-    font-size: 1.2rem;
-    margin: 0;
-  }
+.story-ctn h2 {
+  text-transform: uppercase;
+  align-self: center;
+  font-weight: 600;
+  font-size: 1.2rem;
+  margin: 0;
+}
 
-  p {
-    text-transform: initial;
-    font-size: 0.95rem;
-    line-height: 1.7;
-    letter-spacing: normal;
-  }
+.story-ctn p {
+  text-transform: initial;
+  font-size: 0.95rem;
+  line-height: 1.7;
+  letter-spacing: normal;
 }
 
 .program {
@@ -338,10 +366,10 @@ flex-direction:column ;
   text-align: center;
   display: grid;
   gap: 16px;
+}
 
-  figure{
-    margin: 0;
-  }
+.closing figure {
+  margin: 0;
 }
 
 .closing__names {
@@ -349,6 +377,40 @@ flex-direction:column ;
   letter-spacing: 0.24em;
   font-size: 1.1rem;
   margin: 0;
+}
+
+@keyframes fade-up {
+  0% {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scroll-indicator {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(10px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 @media (min-width: 768px) {
