@@ -113,33 +113,35 @@ const countdownElements = {
   seconds: document.getElementById('seconds'),
 };
 
-const weddingDate = new Date('2026-12-12T15:00:00Z');
+if (Object.values(countdownElements).every(Boolean)) {
+  const weddingDate = new Date('2026-12-12T15:00:00Z');
 
-function updateCountdown() {
-  const now = new Date();
-  const diff = weddingDate.getTime() - now.getTime();
+  const updateCountdown = () => {
+    const now = new Date();
+    const diff = weddingDate.getTime() - now.getTime();
 
-  if (diff <= 0) {
-    countdownElements.days.textContent = '00';
-    countdownElements.hours.textContent = '00';
-    countdownElements.minutes.textContent = '00';
-    countdownElements.seconds.textContent = '00';
-    return;
-  }
+    if (diff <= 0) {
+      countdownElements.days.textContent = '00';
+      countdownElements.hours.textContent = '00';
+      countdownElements.minutes.textContent = '00';
+      countdownElements.seconds.textContent = '00';
+      return;
+    }
 
-  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-  const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
-  const minutes = Math.floor((diff / (1000 * 60)) % 60);
-  const seconds = Math.floor((diff / 1000) % 60);
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+    const minutes = Math.floor((diff / (1000 * 60)) % 60);
+    const seconds = Math.floor((diff / 1000) % 60);
 
-  countdownElements.days.textContent = String(days).padStart(2, '0');
-  countdownElements.hours.textContent = String(hours).padStart(2, '0');
-  countdownElements.minutes.textContent = String(minutes).padStart(2, '0');
-  countdownElements.seconds.textContent = String(seconds).padStart(2, '0');
+    countdownElements.days.textContent = String(days).padStart(2, '0');
+    countdownElements.hours.textContent = String(hours).padStart(2, '0');
+    countdownElements.minutes.textContent = String(minutes).padStart(2, '0');
+    countdownElements.seconds.textContent = String(seconds).padStart(2, '0');
+  };
+
+  updateCountdown();
+  setInterval(updateCountdown, 1000);
 }
-
-updateCountdown();
-setInterval(updateCountdown, 1000);
 
 const scrollButton = document.querySelector('.scroll-hint');
 const introSection = document.getElementById('intro');
@@ -147,5 +149,161 @@ const introSection = document.getElementById('intro');
 if (scrollButton && introSection) {
   scrollButton.addEventListener('click', () => {
     introSection.scrollIntoView({ behavior: 'smooth' });
+  });
+}
+
+const modal = document.getElementById('site-modal');
+
+if (modal) {
+  const navToggle = document.querySelector('.site-nav-button');
+  const modalOverlay = modal.querySelector('.modal__overlay');
+  const modalCloseButtons = Array.from(modal.querySelectorAll('[data-close-modal]'));
+  const modalNavButtons = Array.from(modal.querySelectorAll('[data-modal-target]'));
+  const modalPanels = Array.from(modal.querySelectorAll('[data-modal-panel]'));
+  const modalHomeLink = modal.querySelector('[data-modal-home]');
+  const modalPanelsContainer = modal.querySelector('.modal__panels');
+  const modalTriggers = Array.from(document.querySelectorAll('[data-open-modal]'));
+  const focusableSelectors = 'a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])';
+
+  let previousActiveElement = null;
+  let activePanel = 'default';
+
+  const setPanel = (panelName = 'default') => {
+    const targetPanel = modalPanels.find((panel) => panel.dataset.modalPanel === panelName);
+    const finalPanel = targetPanel ? panelName : 'default';
+    activePanel = finalPanel;
+
+    modalPanels.forEach((panel) => {
+      const isActive = panel.dataset.modalPanel === finalPanel;
+      panel.toggleAttribute('hidden', !isActive);
+    });
+
+    modalNavButtons.forEach((button) => {
+      const isActive = button.dataset.modalTarget === finalPanel;
+      button.setAttribute('aria-pressed', String(isActive));
+    });
+
+    if (modalPanelsContainer) {
+      modalPanelsContainer.scrollTop = 0;
+    }
+  };
+
+  const getFocusableElements = () =>
+    Array.from(modal.querySelectorAll(focusableSelectors)).filter(
+      (element) => !element.hasAttribute('hidden') && !element.closest('[hidden]')
+    );
+
+  const focusRsvpField = () => {
+    const firstField = modal.querySelector('#last-name');
+    if (firstField) {
+      firstField.focus({ preventScroll: true });
+    }
+  };
+
+  const trapFocus = (event) => {
+    const focusableElements = getFocusableElements();
+    if (!focusableElements.length) {
+      return;
+    }
+
+    const firstElement = focusableElements[0];
+    const lastElement = focusableElements[focusableElements.length - 1];
+    const isShiftPressed = event.shiftKey;
+    const activeElement = document.activeElement;
+
+    if (!isShiftPressed && activeElement === lastElement) {
+      event.preventDefault();
+      firstElement.focus();
+    } else if (isShiftPressed && activeElement === firstElement) {
+      event.preventDefault();
+      lastElement.focus();
+    }
+  };
+
+  const handleKeydown = (event) => {
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      closeModal();
+      return;
+    }
+
+    if (event.key === 'Tab') {
+      trapFocus(event);
+    }
+  };
+
+  const openModal = (panelName = 'default') => {
+    previousActiveElement = document.activeElement;
+    modal.classList.add('is-open');
+    modal.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('modal-open');
+    navToggle?.setAttribute('aria-expanded', 'true');
+
+    setPanel(panelName);
+
+    const closeButton = modal.querySelector('.modal__close');
+
+    if (panelName === 'rsvp') {
+      window.requestAnimationFrame(focusRsvpField);
+    } else if (closeButton) {
+      closeButton.focus();
+    }
+
+    document.addEventListener('keydown', handleKeydown);
+  };
+
+  const closeModal = () => {
+    if (!modal.classList.contains('is-open')) {
+      return;
+    }
+
+    modal.classList.remove('is-open');
+    modal.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('modal-open');
+    navToggle?.setAttribute('aria-expanded', 'false');
+    document.removeEventListener('keydown', handleKeydown);
+
+    if (previousActiveElement && typeof previousActiveElement.focus === 'function') {
+      previousActiveElement.focus({ preventScroll: true });
+    }
+
+    previousActiveElement = null;
+    setPanel('default');
+  };
+
+  navToggle?.addEventListener('click', () => {
+    if (modal.classList.contains('is-open')) {
+      closeModal();
+    } else {
+      openModal('default');
+    }
+  });
+
+  modalOverlay?.addEventListener('click', closeModal);
+  modalCloseButtons.forEach((button) => {
+    button.addEventListener('click', closeModal);
+  });
+
+  modalNavButtons.forEach((button) => {
+    button.addEventListener('click', () => {
+      const targetPanel = button.dataset.modalTarget;
+      setPanel(targetPanel);
+      if (targetPanel === 'rsvp') {
+        window.requestAnimationFrame(focusRsvpField);
+      }
+    });
+  });
+
+  modalHomeLink?.addEventListener('click', (event) => {
+    event.preventDefault();
+    closeModal();
+    document.getElementById('intro')?.scrollIntoView({ behavior: 'smooth' });
+  });
+
+  modalTriggers.forEach((trigger) => {
+    trigger.addEventListener('click', () => {
+      const panelName = trigger.dataset.openModal || 'default';
+      openModal(panelName);
+    });
   });
 }

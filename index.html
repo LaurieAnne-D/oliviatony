@@ -12,7 +12,7 @@
 </head>
 
 <body>
-  <main class="page">
+  <main class="page" id="top">
     <section class="hero">
       <p class="overline animate-on-load">Save the date</p>
       <figure class="hero__figure animate-on-load">
@@ -25,11 +25,24 @@
       </div>
       <p class="hero__date animate-on-load">12 déc 2026</p>
       <button class="scroll-hint animate-on-load" aria-label="Défiler vers la suite">
-        <span></span>
+        <span class="scroll-hint__track" aria-hidden="true">
+          <span class="scroll-hint__line"></span>
+          <span class="scroll-hint__ring"></span>
+          <span class="scroll-hint__dot"></span>
+        </span>
       </button>
     </section>
 
     <section class="introduction reveal-on-scroll" id="intro">
+      <div class="intro-nav">
+        <button class="site-nav-button" type="button" aria-label="Ouvrir la navigation" aria-controls="site-modal" aria-expanded="false">
+          <span class="site-nav-button__icon" aria-hidden="true">
+            <span></span>
+            <span></span>
+            <span></span>
+          </span>
+        </button>
+      </div>
       <div class="section-heading intro-heading">
         <div class="rule"></div>
         <p class="monogram">OT</p>
@@ -119,29 +132,29 @@
         <h2 id="faq-title">FAQ</h2>
       </div>
       <div class="faq__item">
-        <button class="faq__question" aria-expanded="false">
+        <button class="faq__question" id="faq-question-1" aria-expanded="false" aria-controls="faq-answer-1">
           Y a-t-il un dress code ?
           <span class="faq__icon" aria-hidden="true">+</span>
         </button>
-        <p class="faq__answer">
+        <p class="faq__answer" id="faq-answer-1" role="region" aria-labelledby="faq-question-1">
           Une tenue chic et légère aux tons naturels est idéale pour profiter du cadre tropical.
         </p>
       </div>
       <div class="faq__item">
-        <button class="faq__question" aria-expanded="false">
+        <button class="faq__question" id="faq-question-2" aria-expanded="false" aria-controls="faq-answer-2">
           Peut-on venir avec des enfants ?
           <span class="faq__icon" aria-hidden="true">+</span>
         </button>
-        <p class="faq__answer">
+        <p class="faq__answer" id="faq-answer-2" role="region" aria-labelledby="faq-question-2">
           Bien sûr, les enfants sont les bienvenus ! Merci de nous l'indiquer lors de votre RSVP.
         </p>
       </div>
       <div class="faq__item">
-        <button class="faq__question" aria-expanded="false">
+        <button class="faq__question" id="faq-question-3" aria-expanded="false" aria-controls="faq-answer-3">
           Où se garer ?
           <span class="faq__icon" aria-hidden="true">+</span>
         </button>
-        <p class="faq__answer">
+        <p class="faq__answer" id="faq-answer-3" role="region" aria-labelledby="faq-question-3">
           Un parking privé est disponible sur place. Des navettes seront prévues depuis Fort-de-France.
         </p>
       </div>
@@ -151,7 +164,7 @@
       <div class="rsvp__card reveal-on-scroll">
         <h2 id="rsvp-title">RSVP</h2>
         <p>Un petit mot pour confirmer avant le 1er septembre 2026.</p>
-        <a class="rsvp__button" href="mailto:oliviaettony2026@example.com">RSVP ici</a>
+        <button class="rsvp__button" type="button" data-open-modal="rsvp">RSVP ici</button>
       </div>
     </section>
 
@@ -163,6 +176,144 @@
       <p class="monogram">OT</p>
     </section>
   </main>
+
+  <div class="modal" id="site-modal" aria-hidden="true">
+    <div class="modal__overlay" data-close-modal></div>
+    <div class="modal__dialog" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <header class="modal__header">
+        <h2 id="modal-title">Navigation &amp; RSVP</h2>
+        <button type="button" class="modal__close" data-close-modal aria-label="Fermer la fenêtre">
+          <span></span>
+          <span></span>
+        </button>
+      </header>
+      <nav class="modal__nav" aria-label="Navigation principale">
+        <ul>
+          <li><a href="#intro" data-modal-home>Home</a></li>
+          <li><button type="button" data-modal-target="menu" aria-pressed="false">Menu</button></li>
+          <li><button type="button" data-modal-target="rsvp" aria-pressed="false">RSVP</button></li>
+        </ul>
+      </nav>
+      <div class="modal__panels">
+        <section class="modal__panel" data-modal-panel="default">
+          <p>Sélectionnez une section pour accéder au menu ou au formulaire.</p>
+        </section>
+        <section class="modal__panel" data-modal-panel="menu" hidden>
+          <h3>Menu de Mariage</h3>
+          <div class="menu-section">
+            <h4>Cocktail de bienvenue</h4>
+            <ul class="menu-list">
+              <li>Accras de morue &amp; sauce créole</li>
+              <li>Mini tartelettes tomate confite, basilic (🌱)</li>
+              <li>Brochettes de crevette, citron vert &amp; gingembre</li>
+              <li>Samoussas légumes, chutney mangue (🌱)</li>
+              <li>Mini burgers bœuf, oignons confits</li>
+              <li>Shots de gaspacho pastèque–menthe (🌱)</li>
+            </ul>
+          </div>
+          <div class="menu-section">
+            <h4>Entrée</h4>
+            <ul class="menu-list">
+              <li>Ceviche de dorade, lait de coco, zeste de combava</li>
+              <li class="menu-list__separator">ou</li>
+              <li>Burrata crémeuse, tomates anciennes, huile au basilic (🌱)</li>
+            </ul>
+          </div>
+          <div class="menu-section">
+            <h4>Plat</h4>
+            <ul class="menu-list">
+              <li>Suprême de volaille fermière, jus au rhum vieux, purée de patate douce</li>
+              <li class="menu-list__separator">ou</li>
+              <li>Pavé de mahi-mahi rôti, émulsion citronnelle, riz coco</li>
+            </ul>
+            <p class="menu-section__note">Option végétarienne : Raviole ouverte de légumes rôtis, crème de petits pois &amp; citron (🌱)</p>
+          </div>
+          <div class="menu-section">
+            <h4>Accompagnements à partager</h4>
+            <ul class="menu-list">
+              <li>Gratin d’igname</li>
+              <li>Légumes rôtis</li>
+              <li>Riz parfumé (🌱)</li>
+            </ul>
+          </div>
+          <div class="menu-section">
+            <h4>Fromages</h4>
+            <p>Sélection affinée, chutney d’ananas &amp; pain aux noix</p>
+          </div>
+          <div class="menu-section">
+            <h4>Desserts</h4>
+            <ul class="menu-list">
+              <li>Pièce montée vanille–praliné</li>
+              <li>Île flottante à la vanille bourbon</li>
+              <li>Tarte passion–mangue</li>
+              <li>Buffet de fruits frais (🌱)</li>
+            </ul>
+          </div>
+          <div class="menu-section">
+            <h4>Bar &amp; boissons</h4>
+            <p>Signature cocktails : Ti-punch doux, Spritz passion</p>
+            <p>Vins blanc &amp; rouge, champagne pour le toast</p>
+            <p>Softs : eaux, citronnade maison, thés glacés</p>
+          </div>
+          <div class="menu-section">
+            <h4>Late-night</h4>
+            <ul class="menu-list">
+              <li>Mini bokits poulet &amp; veggie (🌱)</li>
+              <li>Cornet de frites de manioc (🌱)</li>
+            </ul>
+          </div>
+        </section>
+        <section class="modal__panel" data-modal-panel="rsvp" hidden>
+          <h3>Confirmez votre présence</h3>
+          <form class="rsvp-form" action="#" method="post">
+            <div class="form__group">
+              <label for="last-name">Nom</label>
+              <input type="text" id="last-name" name="lastName" autocomplete="family-name" required />
+            </div>
+            <div class="form__group">
+              <label for="first-name">Prénom</label>
+              <input type="text" id="first-name" name="firstName" autocomplete="given-name" required />
+            </div>
+            <div class="form__group">
+              <label for="email">Adresse mail</label>
+              <input type="email" id="email" name="email" autocomplete="email" required />
+            </div>
+
+            <fieldset class="form__group">
+              <legend>Présence</legend>
+              <div class="form__choice">
+                <input type="radio" id="presence-yes" name="presence" value="oui" required />
+                <label for="presence-yes">Oui, je serai présent·e</label>
+              </div>
+              <div class="form__choice">
+                <input type="radio" id="presence-no" name="presence" value="non" />
+                <label for="presence-no">Non, je ne pourrai pas venir</label>
+              </div>
+            </fieldset>
+
+            <fieldset class="form__group">
+              <legend>+1</legend>
+              <div class="form__choice">
+                <input type="radio" id="plusone-yes" name="plusOne" value="oui" required />
+                <label for="plusone-yes">Oui, j'aurai un·e accompagnant·e</label>
+              </div>
+              <div class="form__choice">
+                <input type="radio" id="plusone-no" name="plusOne" value="non" />
+                <label for="plusone-no">Non, je viendrai seul·e</label>
+              </div>
+            </fieldset>
+
+            <div class="form__group">
+              <label for="allergies">Allergies ou restrictions alimentaires</label>
+              <textarea id="allergies" name="allergies" rows="4" placeholder="Merci de préciser s'il y en a"></textarea>
+            </div>
+
+            <button type="submit" class="rsvp-submit">Envoyer</button>
+          </form>
+        </section>
+      </div>
+    </div>
+  </div>
 
   <script src="script.js"></script>
 </body>
