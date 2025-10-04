@@ -35,12 +35,13 @@
 
     <section class="introduction reveal-on-scroll" id="intro">
       <div class="intro-nav">
-        <button class="site-nav-button" type="button" aria-label="Ouvrir la navigation" aria-controls="site-modal" aria-expanded="false">
-          <span class="site-nav-button__icon" aria-hidden="true">
+        <button class="site-nav-button" type="button" aria-label="Ouvrir la navigation" aria-controls="site-modal"
+          aria-expanded="false">
+          <div class="site-nav-button__icon" aria-hidden="true">
             <span></span>
             <span></span>
             <span></span>
-          </span>
+          </div>
         </button>
       </div>
       <div class="section-heading intro-heading">
@@ -181,19 +182,18 @@
     <div class="modal__overlay" data-close-modal></div>
     <div class="modal__dialog" role="dialog" aria-modal="true" aria-labelledby="modal-title">
       <header class="modal__header">
-        <h2 id="modal-title">Navigation &amp; RSVP</h2>
+        <nav class="modal__nav" aria-label="Navigation principale">
+          <ul>
+            <li><button type="button" data-modal-target="menu" aria-pressed="false">Menu</button></li>
+            <li><button type="button" data-modal-target="rsvp" aria-pressed="false">RSVP</button></li>
+            <li><a href="#intro" data-modal-home>Home</a></li>
+          </ul>
+        </nav>
         <button type="button" class="modal__close" data-close-modal aria-label="Fermer la fenêtre">
           <span></span>
           <span></span>
         </button>
       </header>
-      <nav class="modal__nav" aria-label="Navigation principale">
-        <ul>
-          <li><a href="#intro" data-modal-home>Home</a></li>
-          <li><button type="button" data-modal-target="menu" aria-pressed="false">Menu</button></li>
-          <li><button type="button" data-modal-target="rsvp" aria-pressed="false">RSVP</button></li>
-        </ul>
-      </nav>
       <div class="modal__panels">
         <section class="modal__panel" data-modal-panel="default">
           <p>Sélectionnez une section pour accéder au menu ou au formulaire.</p>
@@ -226,7 +226,8 @@
               <li class="menu-list__separator">ou</li>
               <li>Pavé de mahi-mahi rôti, émulsion citronnelle, riz coco</li>
             </ul>
-            <p class="menu-section__note">Option végétarienne : Raviole ouverte de légumes rôtis, crème de petits pois &amp; citron (🌱)</p>
+            <p class="menu-section__note">Option végétarienne : Raviole ouverte de légumes rôtis, crème de petits pois
+              &amp; citron (🌱)</p>
           </div>
           <div class="menu-section">
             <h4>Accompagnements à partager</h4>
