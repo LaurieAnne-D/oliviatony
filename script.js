@@ -89,22 +89,102 @@ if (typeof reduceMotionQuery.addEventListener === 'function') {
   reduceMotionQuery.addListener(handleMotionPreferenceChange);
 }
 
-const faqButtons = document.querySelectorAll('.faq__question');
+const faqButtons = Array.from(document.querySelectorAll('.faq__question'));
+const faqAnimationHandlers = new WeakMap();
 
-faqButtons.forEach((button) => {
-  button.addEventListener('click', () => {
-    const isExpanded = button.getAttribute('aria-expanded') === 'true';
+const getFaqAnswer = (button) => {
+  const answer = button?.nextElementSibling;
+  return answer instanceof HTMLElement && answer.classList.contains('faq__answer') ? answer : null;
+};
 
-    // Close other entries for an accordion-like behavior
-    faqButtons.forEach((other) => {
-      other.setAttribute('aria-expanded', 'false');
-    });
+const removeFaqHandler = (answer, key) => {
+  const handlers = faqAnimationHandlers.get(answer);
+  if (handlers?.[key]) {
+    answer.removeEventListener('transitionend', handlers[key]);
+    handlers[key] = null;
+  }
+};
 
-    if (!isExpanded) {
-      button.setAttribute('aria-expanded', 'true');
+const registerFaqHandler = (answer, key, handler) => {
+  let handlers = faqAnimationHandlers.get(answer);
+  if (!handlers) {
+    handlers = {};
+    faqAnimationHandlers.set(answer, handlers);
+  }
+  handlers[key] = handler;
+  answer.addEventListener('transitionend', handler);
+};
+
+const setFaqExpanded = (button, expand) => {
+  const answer = getFaqAnswer(button);
+
+  if (!answer) {
+    button.setAttribute('aria-expanded', String(expand));
+    return;
+  }
+
+  removeFaqHandler(answer, 'onOpenEnd');
+  removeFaqHandler(answer, 'onCloseEnd');
+
+  if (expand) {
+    button.setAttribute('aria-expanded', 'true');
+
+    if (reduceMotionQuery.matches) {
+      answer.style.maxHeight = 'none';
+      return;
     }
+
+    const onOpenEnd = (event) => {
+      if (event.target !== answer || event.propertyName !== 'max-height') {
+        return;
+      }
+      answer.style.maxHeight = 'none';
+      removeFaqHandler(answer, 'onOpenEnd');
+    };
+
+    registerFaqHandler(answer, 'onOpenEnd', onOpenEnd);
+
+    answer.style.maxHeight = `${answer.scrollHeight}px`;
+    return;
+  }
+
+  const currentHeight = answer.scrollHeight;
+  answer.style.maxHeight = `${currentHeight}px`;
+  answer.offsetHeight;
+  button.setAttribute('aria-expanded', 'false');
+
+  if (reduceMotionQuery.matches) {
+    answer.style.maxHeight = '';
+    return;
+  }
+
+  const onCloseEnd = (event) => {
+    if (event.target !== answer || event.propertyName !== 'max-height') {
+      return;
+    }
+    answer.style.maxHeight = '';
+    removeFaqHandler(answer, 'onCloseEnd');
+  };
+
+  registerFaqHandler(answer, 'onCloseEnd', onCloseEnd);
+
+  window.requestAnimationFrame(() => {
+    answer.style.maxHeight = '0px';
   });
-});
+};
+
+if (faqButtons.length) {
+  faqButtons.forEach((button) => {
+    button.addEventListener('click', () => {
+      const isExpanded = button.getAttribute('aria-expanded') === 'true';
+
+      faqButtons.forEach((otherButton) => {
+        const shouldExpand = otherButton === button && !isExpanded;
+        setFaqExpanded(otherButton, shouldExpand);
+      });
+    });
+  });
+}
 
 const countdownElements = {
   days: document.getElementById('days'),
@@ -167,6 +247,7 @@ if (modal) {
 
   let previousActiveElement = null;
   let activePanel = 'default';
+  let panelResetTimeout = null;
 
   const setPanel = (panelName = 'default') => {
     const targetPanel = modalPanels.find((panel) => panel.dataset.modalPanel === panelName);
@@ -186,6 +267,28 @@ if (modal) {
     if (modalPanelsContainer) {
       modalPanelsContainer.scrollTop = 0;
     }
+  };
+
+  const clearPendingPanelReset = () => {
+    if (panelResetTimeout !== null) {
+      window.clearTimeout(panelResetTimeout);
+      panelResetTimeout = null;
+    }
+  };
+
+  const schedulePanelReset = () => {
+    clearPendingPanelReset();
+    const resetDelay = reduceMotionQuery.matches ? 0 : 550;
+
+    if (resetDelay === 0) {
+      setPanel('default');
+      return;
+    }
+
+    panelResetTimeout = window.setTimeout(() => {
+      setPanel('default');
+      panelResetTimeout = null;
+    }, resetDelay);
   };
 
   const getFocusableElements = () =>
@@ -234,6 +337,7 @@ if (modal) {
 
   const openModal = (panelName = 'default') => {
     previousActiveElement = document.activeElement;
+    clearPendingPanelReset();
     modal.classList.add('is-open');
     modal.setAttribute('aria-hidden', 'false');
     document.body.classList.add('modal-open');
@@ -268,7 +372,7 @@ if (modal) {
     }
 
     previousActiveElement = null;
-    setPanel('default');
+    schedulePanelReset();
   };
 
   navToggle?.addEventListener('click', () => {

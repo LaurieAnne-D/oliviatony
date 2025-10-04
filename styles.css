@@ -176,6 +176,16 @@ section {
   background: var(--light);
 }
 
+.intro-nav {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 20px;
+  padding-right: 16px;
+  margin-inline: calc(-1 * var(--page-inline-padding));
+  margin-bottom: 16px;
+  border-top: 1px solid var(--accent);
+}
+
 .monogram {
   font-size: 1.8rem;
   letter-spacing: 0.5em;
@@ -377,11 +387,12 @@ body.js .faq__answer {
   opacity: 0;
   overflow: hidden;
   padding-bottom: 0;
-  transition: max-height 0.32s ease, opacity 0.28s ease, padding 0.32s ease;
+  transition: max-height 0.44s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.28s ease,
+    padding 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+  will-change: max-height, opacity, padding;
 }
 
 body.js .faq__question[aria-expanded="true"]+.faq__answer {
-  max-height: 560px;
   opacity: 1;
   padding-bottom: 14px;
 }
@@ -610,13 +621,6 @@ fieldset.form__group legend {
   outline-offset: 3px;
 }
 
-.intro-nav {
-  margin-top: 16px;
-  display: flex;
-  justify-content: flex-end;
-  margin-bottom: 16px;
-}
-
 body.modal-open {
   overflow: hidden;
 }
@@ -671,14 +675,31 @@ body.modal-open {
   z-index: 1000;
 }
 
-.modal.is-open {
+body.js .modal {
   display: flex;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.45s ease, visibility 0s linear 0.45s;
+}
+
+body.js .modal.is-open {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transition: opacity 0.45s ease, visibility 0s linear 0s;
 }
 
 .modal__overlay {
   position: absolute;
   inset: 0;
   background: linear-gradient(120deg, #f3f3f3 0%, #f3efef 45%, #f5f2f2 100%);
+  opacity: 0;
+  transition: opacity 0.45s ease;
+}
+
+.modal.is-open .modal__overlay {
+  opacity: 1;
 }
 
 .modal__dialog {
@@ -693,6 +714,13 @@ body.modal-open {
   gap: 24px;
   box-shadow: none;
   overflow: hidden;
+  transform: translateX(100%);
+  transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+
+.modal.is-open .modal__dialog {
+  transform: translateX(0);
 }
 
 .modal__header {
@@ -859,6 +887,25 @@ body.modal-open {
   font-size: 0.84rem;
   line-height: 1.5;
   color: rgba(39, 44, 44, 0.85);
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  body.js .modal,
+  body.js .modal.is-open {
+    transition: none;
+  }
+
+  .modal__overlay,
+  body.js .modal.is-open .modal__overlay {
+    transition: none;
+  }
+
+  .modal__dialog,
+  body.js .modal.is-open .modal__dialog {
+    transition: none;
+    transform: translateX(0);
+  }
 }
 
 @media (min-width: 768px) {
